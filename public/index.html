@@ -747,11 +747,26 @@
             opacity: 0;
             transform: translateY(30px) scale(0.95);
             transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: none;
+            /* Hidden by default */
         }
 
         .poem-section.visible {
+            display: block;
             opacity: 1;
             transform: translateY(0) scale(1);
+            animation: poemFadeIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes poemFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .poem-section .poem-title {
@@ -1198,13 +1213,13 @@
     </section>
 
     <!-- ============================================================ -->
-    <!-- SECTION 34 -->
+    <!-- SECTION 3 -->
     <!-- ============================================================ -->
     <section class="section" id="section-3" data-index="3">
         <div class="section-content">
             <div class="story-card" id="story-3">
                 <div class="story-text">
-                    <span class="icon">🌟</span>
+                    <span class="icon">💛</span>
                     <h2>A heart that <span class="highlight-text">celebrates</span></h2>
                     <p>
                         I especially appreciate the many times you've asked me, <em>"Are you okay?"</em>
@@ -1462,21 +1477,56 @@
             };
 
             // ============================================================
-            // 2. AUDIO - Auto-play with no controls
+            // 2. AUDIO - Fixed for mobile
             // ============================================================
             const audio = new Audio('audio/highlands.mp3');
             audio.loop = true;
             audio.volume = 0.4;
+            audio.preload = 'auto';
 
-            function tryAutoPlay() {
-                audio.play().catch(() => {
-                    document.addEventListener('click', function playOnce() {
-                        audio.play().catch(() => {});
-                        document.removeEventListener('click', playOnce);
-                    }, { once: true });
-                });
+            let audioStarted = false;
+
+            function startAudio() {
+                if (audioStarted) return;
+                audio.play()
+                    .then(() => {
+                        audioStarted = true;
+                        console.log('🎵 Audio started!');
+                    })
+                    .catch(err => {
+                        console.log('Audio play failed:', err);
+                    });
             }
-            tryAutoPlay();
+
+            // Try multiple ways to start audio
+            function initAudio() {
+                // Try immediately
+                startAudio();
+
+                // Try on any user interaction
+                const events = ['click', 'touchstart', 'scroll', 'keydown'];
+                events.forEach(event => {
+                    document.addEventListener(event, function handler() {
+                        startAudio();
+                        events.forEach(e => document.removeEventListener(e, handler));
+                    });
+                });
+
+                // Specifically for mobile - tap on the page
+                document.body.addEventListener('touchstart', function handler() {
+                    startAudio();
+                    document.body.removeEventListener('touchstart', handler);
+                }, { once: true });
+
+                // Also try when any gift box is clicked
+                document.querySelector('.gift-grid')?.addEventListener('click', function handler() {
+                    startAudio();
+                    document.querySelector('.gift-grid')?.removeEventListener('click', handler);
+                }, { once: true });
+            }
+
+            // Initialize audio
+            initAudio();
 
             // ============================================================
             // 3. BACKGROUND PARTICLES
@@ -1818,12 +1868,20 @@
             }
 
             function showPoem() {
-                poemSection.classList.add('visible');
-                poemLines.forEach((line, i) => {
-                    setTimeout(() => {
-                        line.classList.add('visible');
-                    }, 500 + i * 80);
-                });
+                // Make poem visible with staggered animation
+                poemSection.style.display = 'block';
+
+                // Trigger the visibility with a small delay for smooth animation
+                setTimeout(() => {
+                    poemSection.classList.add('visible');
+
+                    // Stagger each line
+                    poemLines.forEach((line, i) => {
+                        setTimeout(() => {
+                            line.classList.add('visible');
+                        }, 400 + i * 70);
+                    });
+                }, 300);
             }
 
             async function selectGift(giftId) {
