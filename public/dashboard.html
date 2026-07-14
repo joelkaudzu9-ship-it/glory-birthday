@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gift Selection Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0a13;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #eee9f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(18, 16, 30, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+            padding: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #f7e9b0, #d4b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            color: #6a5f8a;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 1.5rem;
+        }
+
+        .status-card .label {
+            color: #8a7aa8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-card .value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .status-card .value .emoji {
+            font-size: 2.5rem;
+        }
+
+        .status-card .value .gift-name {
+            background: linear-gradient(135deg, #d4b8ff, #f7e9b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-card .timestamp {
+            color: #6a5f8a;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .gift-grid-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .gift-preview {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .gift-preview .icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .gift-preview .name {
+            font-size: 0.8rem;
+            color: #8a7aa8;
+        }
+
+        .gift-preview.selected {
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.05);
+        }
+
+        .gift-preview.selected .name {
+            color: #d4b8ff;
+        }
+
+        .gift-preview .check {
+            display: none;
+            color: #a78bfa;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .gift-preview.selected .check {
+            display: block;
+        }
+
+        .refresh-btn {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            color: #d4b8ff;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.3);
+        }
+
+        .no-selection {
+            color: #6a5f8a;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .status-card .value {
+                font-size: 1.5rem;
+            }
+            .gift-grid-preview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>🎁 Gift Tracker</h1>
+        <div class="sub">See what Glory chose on her birthday</div>
+
+        <div class="status-card" id="statusCard">
+            <div class="label">Status</div>
+            <div class="value" id="statusValue">
+                <span class="no-selection">⏳ Waiting for selection...</span>
+            </div>
+            <div class="timestamp" id="timestamp"></div>
+        </div>
+
+        <div class="gift-grid-preview" id="giftPreview">
+            <div class="gift-preview" data-gift="lunchbox">
+                <span class="icon">🧺</span>
+                <div class="name">Lunch Box</div>
+                <div class="check">✓ Selected</div>
+            </div>
+            <div class="gift-preview" data-gift="chocolate">
+                <span class="icon">🍫</span>
+                <div class="name">Chocolate</div>
+                <div class="check">✓ Selected</div>
+            </div>
+            <div class="gift-preview" data-gift="diary">
+                <span class="icon">📖</span>
+                <div class="name">Diary</div>
+                <div class="check">✓ Selected</div>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="loadData()">🔄 Refresh</button>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('/api/selections');
+                const data = await response.json();
+
+                const statusValue = document.getElementById('statusValue');
+                const timestamp = document.getElementById('timestamp');
+
+                // Reset all previews
+                document.querySelectorAll('.gift-preview').forEach(el => {
+                    el.classList.remove('selected');
+                });
+
+                if (data.selections && data.selections.length > 0) {
+                    const selection = data.selections[0];
+                    const giftNames = {
+                        'lunchbox': '🧺 Lunch Box Takeaway',
+                        'chocolate': '🍫 Chocolate Delight',
+                        'diary': '📖 A Beautiful Diary'
+                    };
+
+                    statusValue.innerHTML = `
+                        <span class="emoji">🎉</span>
+                        <span class="gift-name">${giftNames[selection.gift] || selection.gift}</span>
+                    `;
+
+                    timestamp.textContent = `Selected on ${new Date(selection.timestamp).toLocaleString()}`;
+
+                    // Highlight selected gift
+                    document.querySelectorAll('.gift-preview').forEach(el => {
+                        if (el.dataset.gift === selection.gift) {
+                            el.classList.add('selected');
+                        }
+                    });
+                } else {
+                    statusValue.innerHTML = `<span class="no-selection">⏳ No gift selected yet...</span>`;
+                    timestamp.textContent = '';
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('statusValue').innerHTML =
+                    `<span style="color:#f7a8b0;">❌ Error loading data. Is the server running?</span>`;
+            }
+        }
+
+        // Auto-refresh every 10 seconds
+        loadData();
+        setInterval(loadData, 10000);
+    </script>
+</body>
+</html>
