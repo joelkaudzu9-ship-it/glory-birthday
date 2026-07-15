@@ -91,9 +91,9 @@ app.get('/ping', (req, res) => {
 });
 
 // ============================================================
-// Reset selections (for testing/clearing)
+// Reset selections - NOW USING GET (easier to use in browser)
 // ============================================================
-app.post('/api/reset', (req, res) => {
+app.get('/api/reset', (req, res) => {
     const data = { 
         selections: [], 
         timestamp: new Date().toISOString() 
@@ -124,4 +124,5 @@ app.listen(PORT, () => {
     console.log('🎉 Server running on http://localhost:3000');
     console.log('📊 Dashboard: http://localhost:3000/dashboard');
     console.log('🏓 Ping endpoint: http://localhost:3000/ping');
+    console.log('🔄 Reset endpoint: http://localhost:3000/api/reset');
 });
