@@ -83,6 +83,28 @@ app.post('/api/select', (req, res) => {
     });
 });
 
+// ============================================================
+// KEEP-ALIVE ENDPOINT (for cron-job.org)
+// ============================================================
+app.get('/ping', (req, res) => {
+    res.status(200).send('ok');
+});
+
+// ============================================================
+// Reset selections (for testing/clearing)
+// ============================================================
+app.post('/api/reset', (req, res) => {
+    const data = { 
+        selections: [], 
+        timestamp: new Date().toISOString() 
+    };
+    writeSelections(data);
+    res.json({ 
+        success: true, 
+        message: 'Selections reset successfully' 
+    });
+});
+
 // Dashboard route
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
@@ -101,4 +123,5 @@ app.get('/favicon.ico', (req, res) => {
 app.listen(PORT, () => {
     console.log('🎉 Server running on http://localhost:3000');
     console.log('📊 Dashboard: http://localhost:3000/dashboard');
+    console.log('🏓 Ping endpoint: http://localhost:3000/ping');
 });
